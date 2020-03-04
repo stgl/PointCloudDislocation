@@ -123,3 +123,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Ignore las and laz data files:
+*.las
+*.laz
