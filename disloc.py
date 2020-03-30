@@ -51,8 +51,12 @@ def deform_dislocation(
 
 
 def deform_point_cloud_dislocation(input_filename, output_filename, **kwargs):
-    xyz = np.loadtxt(input_filename, delimiter=',', skiprows=1)
+    xyz = np.loadtxt(input_filename, delimiter=",", skiprows=1)
 
-    xd, yd, zd = deform_dislocation(xyz[0, :], xyz[1, :], xyz[2, :], **kwargs)
-    
-    np.savetxt(output_filename, np.stack([xd, yd, zd]), delimiter=',')
+    xd, yd, zd = deform_dislocation(xyz[:, 0], xyz[:, 1], xyz[:, 2], **kwargs)
+
+    np.savetxt(
+        output_filename, np.stack([xd, yd, zd], axis=-1), delimiter=",", fmt="%.2f"
+    )
+
+    return np.stack([xd, yd, zd], axis=-1)
