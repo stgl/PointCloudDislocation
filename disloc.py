@@ -51,24 +51,8 @@ def deform_dislocation(
 
 
 def deform_point_cloud_dislocation(input_filename, output_filename, **kwargs):
-
-    from liblas.file import File
-    from copy import deepcopy
-
-    input_file = File(input_filename, mode="r")
-    output_file = File(output_filename, header=input_file.header, mode="w")
-
-    xyz = np.array(list(zip(*[[p.x, p.y, p.z] for p in input_file])))
+    xyz = np.loadtxt(input_filename, delimiter=',', skiprows=1)
 
     xd, yd, zd = deform_dislocation(xyz[0, :], xyz[1, :], xyz[2, :], **kwargs)
-
-    input_file = File(input_filename, mode="r")
-    counter = 0
-
-    for p in input_file:
-
-        p.x = xd[counter]
-        p.y = yd[counter]
-        p.z = zd[counter]
-        output_file.write(p)
-        counter += 1
+    
+    np.savetxt(output_filename, np.stack([xd, yd, zd]), delimiter=',')
