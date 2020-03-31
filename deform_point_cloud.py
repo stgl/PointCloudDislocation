@@ -11,9 +11,9 @@ parser.add_argument("--depth", default=0.001, type=float)
 parser.add_argument("-ss", "--slip_ss", default=0, type=float)
 parser.add_argument("-ds", "--slip_ds", default=1.0, type=float)
 parser.add_argument(
-    "--input", default="/scratch/rmsare/pointclouds/HSLSurvey101319_utm_thin100.csv"
+    "--input", default="data/HSLSurvey101319_utm_thin100.csv"
 )
-parser.add_argument("--output_dir", default="/scratch/rmsare/output/")
+parser.add_argument("--output_dir", default="deformed/")
 parser.add_argument("-c", "--convert_to_las", action="store_true")
 parser.add_argument("-v", action="store_true")
 
