@@ -17,13 +17,14 @@ parser.add_argument("-dy", default=25.0, type=float)
 parser.add_argument("-b", "--buffer_fraction", default=0.1, type=float)
 
 parser.add_argument(
-    "--fixed", default="/scratch/rmsare/pointclouds/HSLSurvey101319_utm_thin100.csv"
+    "--fixed", default="data/HSLSurvey101319_utm_thin100.las"
 )
 parser.add_argument(
     "--moving",
-    default="/scratch/rmsare/output/hsl_s0.00_d90.00_dep0.00_ss0.00_ds10.00.las",
+    default="deformed/hsl_s0.00_d90.00_dep0.00_ss0.00_ds10.00.las",
 )
 parser.add_argument("--output", default=None)
+parser.add_argument("-d", "--use_dask", action="store_true")
 parser.add_argument("-v", action="store_true")
 
 
@@ -34,7 +35,6 @@ if __name__ == "__main__":
         print(f"Reading fixed pc from {args.fixed}...")
         print(f"Reading moving pc from {args.moving}...")
 
-    print("Setting ICP params...")
     fixed = args.fixed
     moving = args.moving
 
@@ -57,11 +57,11 @@ if __name__ == "__main__":
         dy_window=dy_window,
         num_trials=5,
 #        debug=True,
-        use_dask=False,
+        use_dask=args.use_dask,
     )
 
     if args.output is None:
-        args.output = args.moving.replace("output", "icp").replace(
+        args.output = args.moving.replace("output", "results").replace(
             ".las", f"._ICP_w{dx_window::.2f}_str{dx:.2f}.pkl"
         )
 
