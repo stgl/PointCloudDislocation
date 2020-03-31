@@ -63,3 +63,15 @@ def deform_point_cloud_dislocation(input_filename, output_filename, **kwargs):
     )
 
     #return np.stack([xd, yd, zd], axis=-1)
+
+
+def deform_point_cloud_dislocation_by_point(input_filename, output_filename, **kwargs):
+    infile = open(input_filename, 'r')
+    outfile = open(output_filename, 'a+')
+    for line in infile:
+        xyz = list(map(float, line.split(',')))
+        xd, yd, zd = deform_dislocation(xyz[0], xyz[1], xyz[2], **kwargs)
+        outline = f'{xd:.5f}, {yd:.5f}, {zd:.5f}\n'  
+        outfile.write(outline)
+
+    #return np.stack([xd, yd, zd], axis=-1)

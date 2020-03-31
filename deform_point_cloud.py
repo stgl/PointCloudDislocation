@@ -2,7 +2,10 @@ import os
 import argparse
 import subprocess
 import numpy as np
-from disloc import deform_point_cloud_dislocation as deform
+from disloc import deform_point_cloud_dislocation_by_point as deform
+
+ORIGIN_X = 321660
+ORIGIN_Y = 4164942
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--strike", default=0, type=float)
@@ -34,6 +37,8 @@ if __name__ == "__main__":
         depth=args.depth,
         slip_ss=args.slip_ss,
         slip_ds=args.slip_ds,
+        origin_x=ORIGIN_X,
+        origin_y=ORIGIN_Y
     )
 
     if args.v:
@@ -50,7 +55,7 @@ if __name__ == "__main__":
             "--readers.text.header=X,Y,Z",
         ]
         subprocess.run(cmd)
-        subprocess.run(["rm",  output])
+        #subprocess.run(["rm",  output])
         output = output.replace(".csv", ".las")
         if args.v:
             print('Wrote output LAS file')
