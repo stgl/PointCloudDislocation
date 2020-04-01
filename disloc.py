@@ -1,5 +1,5 @@
 import numpy as np
-
+import pandas as pd
 
 def deform_dislocation(
     x,
@@ -52,7 +52,8 @@ def deform_dislocation(
 
 def deform_point_cloud_dislocation(input_filename, output_filename, **kwargs):
     print('Reading input...')
-    xyz = np.loadtxt(input_filename, delimiter=",", skiprows=1)
+    #xyz = np.loadtxt(input_filename, delimiter=",", skiprows=1)
+    xyz = pd.read_csv(input_filename, header=None).to_numpy()
 
     print('Applying displacements...')
     xd, yd, zd = deform_dislocation(xyz[:, 0], xyz[:, 1], xyz[:, 2], **kwargs)
