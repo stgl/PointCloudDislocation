@@ -2,7 +2,7 @@ import os
 import argparse
 import subprocess
 import numpy as np
-from disloc import deform_point_cloud_dislocation_by_point as deform
+from disloc import deform_point_cloud_dislocation as deform
 
 ORIGIN_X = 321660
 ORIGIN_Y = 4164942
@@ -29,36 +29,34 @@ if __name__ == "__main__":
         f"{base}_s{args.strike:.2f}_d{args.dip:.2f}_dep{args.depth:.2f}_ss{args.slip_ss:.2f}_ds{args.slip_ds:.2f}.csv",
     )
 
-    deform(
-        args.input,
-        output,
-        strike=args.strike,
-        dip=args.dip,
-        depth=args.depth,
-        slip_ss=args.slip_ss,
-        slip_ds=args.slip_ds,
-        origin_x=ORIGIN_X,
-        origin_y=ORIGIN_Y
-    )
-
-    if args.v:
-        print('Wrote output CSV file')
-
-    if args.convert_to_las:
-        cmd = [
-            "pdal",
-            "translate",
-            "-i",
+    if os.path.exists(output) or os.path.exists(output.replace(".csv", ".las")):
+        print(f'{output} exists. Skipping.')
+    else:
+        deform(
+            args.input,
             output,
-            "-o",
-            output.replace(".csv", ".las"),
-            "--readers.text.header=X,Y,Z",
-        ]
-        subprocess.run(cmd)
-        #subprocess.run(["rm",  output])
-        output = output.replace(".csv", ".las")
+            strike=args.strike,
+            dip=args.dip,
+            depth=args.depth,
+            slip_ss=args.slip_ss,
+            slip_ds=args.slip_ds,
+            origin_x=ORIGIN_X,
+            origin_y=ORIGIN_Y
+        )
+
+        if args.convert_to_las:
+            cmd = [
+                "pdal",
+                "translate",
+                "-i",
+                output,
+                "-o",
+                output.replace(".csv", ".las"),
+                "--readers.text.header=X,Y,Z",
+            ]
+            subprocess.run(cmd)
+            subprocess.run(["rm",  output])
+            output = output.replace(".csv", ".las")
+        
         if args.v:
-            print('Wrote output LAS file')
-    
-    if args.v:
-        print(f"Wrote output to {output}")
+            print(f"Wrote output to {output}")
