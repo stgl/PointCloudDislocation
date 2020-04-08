@@ -1,5 +1,5 @@
 import numpy as np
-
+import pandas as pd
 
 def deform_dislocation(
     x,
@@ -51,24 +51,28 @@ def deform_dislocation(
 
 
 def deform_point_cloud_dislocation(input_filename, output_filename, **kwargs):
+    print('Reading input...')
+    #xyz = np.loadtxt(input_filename, delimiter=",", skiprows=1)
+    xyz = pd.read_csv(input_filename, header=None).to_numpy()
 
-    from liblas.file import File
-    from copy import deepcopy
+    print('Applying displacements...')
+    xd, yd, zd = deform_dislocation(xyz[:, 0], xyz[:, 1], xyz[:, 2], **kwargs)
 
-    input_file = File(input_filename, mode="r")
-    output_file = File(output_filename, header=input_file.header, mode="w")
+    print('Saving output...')
+    np.savetxt(
+        output_filename, np.stack([xd, yd, zd], axis=-1), delimiter=",", fmt="%.2f"
+    )
 
-    xyz = np.array(list(zip(*[[p.x, p.y, p.z] for p in input_file])))
+    #return np.stack([xd, yd, zd], axis=-1)
 
-    xd, yd, zd = deform_dislocation(xyz[0, :], xyz[1, :], xyz[2, :], **kwargs)
 
-    input_file = File(input_filename, mode="r")
-    counter = 0
+def deform_point_cloud_dislocation_by_point(input_filename, output_filename, **kwargs):
+    infile = open(input_filename, 'r')
+    outfile = open(output_filename, 'a+')
+    for line in infile:
+        xyz = list(map(float, line.split(',')))
+        xd, yd, zd = deform_dislocation(xyz[0], xyz[1], xyz[2], **kwargs)
+        outline = f'{xd:.5f}, {yd:.5f}, {zd:.5f}\n'  
+        outfile.write(outline)
 
-    for p in input_file:
-
-        p.x = xd[counter]
-        p.y = yd[counter]
-        p.z = zd[counter]
-        output_file.write(p)
-        counter += 1
+    #return np.stack([xd, yd, zd], axis=-1)
