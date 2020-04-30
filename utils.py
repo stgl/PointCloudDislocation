@@ -23,18 +23,31 @@ def load_and_mask_results(filename, iterations=2, MAX_RESIDUAL=0.05):
 
     return x, y, ux, uy, uz, residual, mask
 
-def print_rmses(ux, uy, uz, uxtrue, uytrue, uztrue):
+def apply_water_mask(u, dx=50):
+    mask = np.zeros_like(u).astype(bool)
+    if dx == 25:
+        mask[20:39, 36:45] = True
+    if dx == 50:
+        mask[12:19, 18:25] = True
+    if dx == 100:
+        mask[6:10, 9:13] = True
+    if dx == 150:
+        mask[4:7, 6:9] = True
+    if dx == 200:
+        mask[4:6, 4:6] = True
+    umasked = u.copy()
+    umasked[mask] = np.nan
+    return umasked
+
+def calc_xyz_rmses(ux, uy, uz, uxtrue, uytrue, uztrue):
     rmse_x = np.sqrt(np.nanmean((ux - uxtrue) ** 2))
     rmse_y = np.sqrt(np.nanmean((uy - uytrue) ** 2))
     rmse_z = np.sqrt(np.nanmean((uz - uztrue) ** 2))
     uh = np.sqrt(ux ** 2 + uy ** 2)
     uhtrue = np.sqrt(uxtrue ** 2 + uytrue ** 2)
     rmse_h = np.sqrt(np.nanmean((uh - uhtrue) ** 2))
-    print(f'RMSE x = {rmse_x:.2f} m')
-    print(f'RMSE y = {rmse_y:.2f} m')
-    print(f'RMSE z = {rmse_z:.2f} m')
-    print(f'RMSE h = {rmse_h:.2f} m')
-
+    return rmse_x, rmse_y, rmse_z, rmse_h
+    
 def transform_displacements(ux, uy, theta=0):
     if theta == 0:
         return uy
@@ -84,3 +97,12 @@ def disloc_model_from_coords_and_mask(x, y, mask, **kwargs):
     uym[~mask] = np.nan
     uzm[~mask] = np.nan
     return uxm, uym, uzm
+
+def rmse(ytrue, yhat):
+    return np.sqrt(np.nanmean((yhat - ytrue) ** 2))
+
+def rotate(x, y, theta):
+    theta *= np.pi / 180
+    u = x * np.cos(theta) - y * np.sin(theta)
+    v = x * np.sin(theta) + y * np.cos(theta)
+    return u, v
